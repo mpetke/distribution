@@ -124,7 +124,11 @@ func NewRegistryPullThroughCache(ctx context.Context, registry distribution.Name
 		}
 	}()
 	if err != nil {
-		return nil, err
+		if err == err.(*url.Error) {
+			dcontext.GetLogger(ctx).Warnf("host is not reachable: %q", config.RemoteURL)
+		} else {
+			return nil, err
+		}
 	}
 
 	return &proxyingRegistry{
